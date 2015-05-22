@@ -87,7 +87,8 @@ int fx3load_from_ihex(fx3_t fx3, const char *path)
 
 		if(len < 0) {
 			fx3load_error_set(fx3, "parsing line %d of image failed", line);
-			continue;
+
+			return -1;
 		}
 
 		uint32_t addr = base_address + offset;
