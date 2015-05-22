@@ -6,6 +6,8 @@
 #include "libfx3load.h"
 #include "libfx3load-private.h"
 
+#define LIBUSB_TIMEOUT 100
+
 fx3_t fx3load_open(uint16_t vid, uint16_t pid) {
 	libusb_context *usb;
 	libusb_device_handle *usb_handle;
@@ -38,19 +40,19 @@ int fx3load_write(fx3_t fx3, uint32_t addr, uint16_t len, uint8_t *data) {
 	return libusb_control_transfer(fx3->usb_dev, 0x40, 0xA0,
 			addr & 0xFFFF,
 			(addr >> 16) & 0xFFFF,
-			data, len, 0);
+			data, len, LIBUSB_TIMEOUT);
 }
 
 int fx3load_read(fx3_t fx3, uint32_t addr, uint16_t len, uint8_t *data) {
 	return libusb_control_transfer(fx3->usb_dev, 0xC0, 0xA0,
 			addr & 0xFFFF,
 			(addr >> 16) & 0xFFFF,
-			data, len, 0);
+			data, len, LIBUSB_TIMEOUT);
 }
 
 int fx3load_exec(fx3_t fx3, uint32_t addr) {
 	return libusb_control_transfer(fx3->usb_dev, 0x40, 0xA0,
 			addr & 0xFFFF,
 			(addr >> 16) & 0xFFFF,
-			NULL, 0, 0);
+			NULL, 0, LIBUSB_TIMEOUT);
 }
