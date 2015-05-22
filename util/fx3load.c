@@ -4,7 +4,8 @@
 
 #include "libfx3load.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	if(argc != 4) {
 		fprintf(stderr, "usage: %s VID PID file.ihex\n", argv[0]);
 		return EXIT_FAILURE;
@@ -23,7 +24,7 @@ int main(int argc, char **argv) {
 	int ret;
 	ret = fx3load_from_ihex(fx3, argv[3]);
 	if(ret < 0) {
-		fprintf(stderr, "fx3load_from_ihex returned %d\n", ret);
+		fprintf(stderr, "loading firmware failed: %s\n", fx3load_error(fx3));
 		return EXIT_FAILURE;
 	}
 
