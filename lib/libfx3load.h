@@ -14,4 +14,6 @@ int fx3load_exec(fx3_t fx3, uint32_t addr);
 
 int fx3load_from_ihex(fx3_t fx3, const char *path);
 
+const char *fx3load_error(fx3_t fx3);
+
 #endif /* _LIBFX3LOAD_H */

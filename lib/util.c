@@ -2,10 +2,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include "libfx3load.h"
+#include "libfx3load-private.h"
 
-static uint32_t hex2bin(const char *p, size_t n) {
+static uint32_t hex2bin(const char *p, size_t n)
+{
 	uint32_t ret = 0;
 
 	while(n--) {
@@ -22,7 +25,8 @@ static uint32_t hex2bin(const char *p, size_t n) {
 	return ret;
 }
 
-static int parse_line(const char *line, uint16_t *offset, uint8_t *type, uint8_t *data) {
+static int parse_line(const char *line, uint16_t *offset, uint8_t *type, uint8_t *data)
+{
 	const char *p = line;
 
 	if(strlen(line) < 11)
@@ -54,26 +58,37 @@ static int parse_line(const char *line, uint16_t *offset, uint8_t *type, uint8_t
 	return len;
 }
 
-int fx3load_from_ihex(fx3_t fx3, const char *path) {
+int fx3load_from_ihex(fx3_t fx3, const char *path)
+{
 	int ret;
 	FILE *f;
 
+	fx3load_error_clear(fx3);
+
 	if((f = fopen(path, "r")) == NULL) {
+		fx3load_error_set(fx3, "opening firmware file failed: %s", strerror(errno));
+
 		return -1;
 	}
 
-	uint32_t base_address = 0;
-
 	char buf[1024];
+	unsigned int line = 0;
+
+	uint32_t base_address = 0;
 	uint8_t data[256];
+
 	while(fgets(buf, 1024, f)) {
 		uint8_t type;
 		uint16_t offset;
 
+		line++;
+
 		int len = parse_line(buf, &offset, &type, data);
 
-		if(len < 0)
+		if(len < 0) {
+			fx3load_error_set(fx3, "parsing line %d of image failed", line);
 			continue;
+		}
 
 		uint32_t addr = base_address + offset;
 
